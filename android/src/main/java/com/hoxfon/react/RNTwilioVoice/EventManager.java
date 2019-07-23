@@ -13,14 +13,12 @@ public class EventManager {
 
     private ReactApplicationContext mContext;
 
-    public static final String EVENT_PROXIMITY = "proximity";
-    public static final String EVENT_WIRED_HEADSET = "wiredHeadset";
-
-    public static final String EVENT_DEVICE_READY = "deviceReady";
-    public static final String EVENT_DEVICE_NOT_READY = "deviceNotReady";
-    public static final String EVENT_CONNECTION_DID_CONNECT = "connectionDidConnect";
-    public static final String EVENT_CONNECTION_DID_DISCONNECT = "connectionDidDisconnect";
-    public static final String EVENT_DEVICE_DID_RECEIVE_INCOMING = "deviceDidReceiveIncoming";
+    public static final String EVENT_CONNECTED = "connected";
+    public static final String EVENT_CONNECT_FAILURE = "connectFailure";
+    public static final String EVENT_RECONNECTING = "reconnecting";
+    public static final String EVENT_RECONNECTED = "reconnected";
+    public static final String EVENT_DISCONNECTED = "disconnected";
+    public static final String EVENT_RINGING = "ringing";
 
     public EventManager(ReactApplicationContext context) {
         mContext = context;
