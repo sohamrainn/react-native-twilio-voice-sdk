@@ -1,4 +1,4 @@
-package com.hoxfon.react.RNTwilioVoice;
+package com.happytheapp.react.RNTwilioVoice;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.JavaScriptModule;

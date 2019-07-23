@@ -1,4 +1,4 @@
-package com.hoxfon.react.RNTwilioVoice;
+package com.happytheapp.react.RNTwilioVoice;
 
 import androidx.annotation.Nullable;
 import android.util.Log;
@@ -7,7 +7,7 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
-import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
+import static com.happytheapp.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 
 public class EventManager {
 

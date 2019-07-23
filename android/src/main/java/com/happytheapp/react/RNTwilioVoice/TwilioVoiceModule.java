@@ -1,4 +1,4 @@
-package com.hoxfon.react.RNTwilioVoice;
+package com.happytheapp.react.RNTwilioVoice;
 
 import android.content.Context;
 import android.media.AudioAttributes;
@@ -31,12 +31,12 @@ import com.twilio.voice.Voice;
 
 import java.util.HashMap;
 
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_RINGING;
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTED;
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECT_FAILURE;
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_RECONNECTING;
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_RECONNECTED;
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DISCONNECTED;
+import static com.happytheapp.react.RNTwilioVoice.EventManager.EVENT_RINGING;
+import static com.happytheapp.react.RNTwilioVoice.EventManager.EVENT_CONNECTED;
+import static com.happytheapp.react.RNTwilioVoice.EventManager.EVENT_CONNECT_FAILURE;
+import static com.happytheapp.react.RNTwilioVoice.EventManager.EVENT_RECONNECTING;
+import static com.happytheapp.react.RNTwilioVoice.EventManager.EVENT_RECONNECTED;
+import static com.happytheapp.react.RNTwilioVoice.EventManager.EVENT_DISCONNECTED;
 
 
 public class TwilioVoiceModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
