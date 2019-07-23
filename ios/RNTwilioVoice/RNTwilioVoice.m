@@ -136,12 +136,22 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (NSMutableDictionary *)paramsForError:(NSError *)error {
     NSMutableDictionary *params = [self callParamsFor:self.call];
+
     if (error) {
-        NSString* errMsg = [error localizedDescription];
-        if (error.localizedFailureReason) {
-            errMsg = [error localizedFailureReason];
+        NSMutableDictionary *errorParams = [[NSMutableDictionary alloc] init];
+        if (error.code) {
+            [errorParams setObject:[@([error code]) stringValue] forKey:@"code"];
         }
-        [params setObject:errMsg forKey:@"error"];
+        if (error.domain) {
+            [errorParams setObject:[error domain] forKey:@"domain"];
+        }
+        if (error.localizedDescription) {
+            [errorParams setObject:[error localizedDescription] forKey:@"message"];
+        }
+        if (error.localizedFailureReason) {
+            [errorParams setObject:[error localizedFailureReason] forKey:@"reason"];
+        }
+        [params setObject:errorParams forKey:@"error"];
     }
     return params;
 }
