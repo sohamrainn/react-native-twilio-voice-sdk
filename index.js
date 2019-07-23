@@ -12,13 +12,12 @@ const TwilioVoice = NativeModules.RNTwilioVoice
 const NativeAppEventEmitter = new NativeEventEmitter(TwilioVoice)
 
 const _eventHandlers = {
-    deviceReady: new Map(),
-    deviceNotReady: new Map(),
-    deviceDidReceiveIncoming: new Map(),
-    connectionDidConnect: new Map(),
-    connectionDidDisconnect: new Map(),
-    //iOS specific
-    callRejected: new Map(),
+    connected: new Map(),
+    connectFailure: new Map(),
+    reconnecting: new Map(),
+    reconnected: new Map(),
+    disconnected: new Map(),
+    ringing: new Map(),
 }
 
 const Twilio = {
@@ -26,52 +25,11 @@ const Twilio = {
     // return {initialized: true} when the initialization started
     // Listen to deviceReady and deviceNotReady events to see whether
     // the initialization succeeded
-    async initWithToken(token) {
-        if (typeof token !== 'string') {
-            return {
-                initialized: false,
-                err:         'Invalid token, token must be a string'
-            }
-        };
-
-        const result = await TwilioVoice.initWithAccessToken(token)
-        // native react promise present only for Android
-        // iOS initWithAccessToken doesn't return
-        if (Platform.OS === IOS) {
-            return {
-                initialized: true,
-            }
-        }
-        return result
-    },
-    initWithTokenUrl(url) {
-        if (Platform.OS === IOS) {
-            TwilioVoice.initWithAccessTokenUrl(url)
-        }
-    },
-    connect(params = {}) {
-        TwilioVoice.connect(params)
+    connect(accessToken, options = {}) {
+        TwilioVoice.connect(accessToken, options)
     },
     disconnect() {
         TwilioVoice.disconnect()
-    },
-    accept() {
-        if (Platform.OS === IOS) {
-            return
-        }
-        TwilioVoice.accept()
-    },
-    reject() {
-        if (Platform.OS === IOS) {
-            return
-        }
-        TwilioVoice.reject()
-    },
-    ignore() {
-        if (Platform.OS === IOS) {
-            return
-        }
-        TwilioVoice.ignore()
     },
     setMuted(isMuted) {
         TwilioVoice.setMuted(isMuted)
@@ -89,16 +47,6 @@ const Twilio = {
     },
     getActiveCall() {
         return TwilioVoice.getActiveCall()
-    },
-    configureCallKit(params = {}) {
-        if (Platform.OS === IOS) {
-            TwilioVoice.configureCallKit(params)
-        }
-    },
-    unregister() {
-        if (Platform.OS === IOS) {
-            TwilioVoice.unregister()
-        }
     },
     addEventListener(type, handler) {
         if (_eventHandlers[type].has(handler)) {
