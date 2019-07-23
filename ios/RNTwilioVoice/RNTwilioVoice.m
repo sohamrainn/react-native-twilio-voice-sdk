@@ -104,7 +104,11 @@ RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
     NSUUID *uuid = [NSUUID UUID];
     NSString *handle = [params valueForKey:@"To"];
     _callParams = [[NSMutableDictionary alloc] initWithDictionary:params];
-    [self performStartCallActionWithUUID:uuid handle:handle];
+    self.call = [TwilioVoice call:[self fetchAccessToken]
+                           params:_callParams
+                             uuid:uuid
+                         delegate:self];
+    // [self performStartCallActionWithUUID:uuid handle:handle];
   }
 }
 
@@ -321,7 +325,7 @@ RCT_REMAP_METHOD(getActiveCall,
 #pragma mark - TVOCallDelegate
 - (void)callDidConnect:(TVOCall *)call {
   self.call = call;
-  self.callKitCompletionCallback(YES);
+  // self.callKitCompletionCallback(YES);
   self.callKitCompletionCallback = nil;
 
   NSMutableDictionary *callParams = [[NSMutableDictionary alloc] init];
@@ -344,7 +348,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
   NSLog(@"Call failed to connect: %@", error);
 
-  self.callKitCompletionCallback(NO);
+  // self.callKitCompletionCallback(NO);
   [self performEndCallActionWithUUID:call.uuid];
   [self callDisconnected:error];
 }
