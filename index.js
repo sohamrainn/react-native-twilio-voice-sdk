@@ -7,7 +7,7 @@ import {
 const ANDROID = 'android'
 const IOS = 'ios'
 
-const TwilioVoice = NativeModules.RNTwilioVoice
+const TwilioVoice = NativeModules.RNTwilioVoiceSDK
 
 const NativeAppEventEmitter = new NativeEventEmitter(TwilioVoice)
 
