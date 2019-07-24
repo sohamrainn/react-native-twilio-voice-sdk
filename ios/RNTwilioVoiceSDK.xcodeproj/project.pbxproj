@@ -8,8 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		016DD9B51ECCA23A00315CD4 /* TwilioVoice.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
-		38F71DFA1E9C333F0067E86F /* RNTwilioVoice.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */; };
-		38F71DFB1E9C333F0067E86F /* RNTwilioVoice.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */; };
+		38F71DFA1E9C333F0067E86F /* RNTwilioVoiceSDK.m in Sources */ = {isa = PBXBuildFile; fileRef = 38F71DF91E9C333F0067E86F /* RNTwilioVoiceSDK.m */; };
+		38F71DFB1E9C333F0067E86F /* RNTwilioVoiceSDK.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 38F71DF81E9C333F0067E86F /* RNTwilioVoiceSDK.h */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -19,7 +19,7 @@
 			dstPath = "include/$(PRODUCT_NAME)";
 			dstSubfolderSpec = 16;
 			files = (
-				38F71DFB1E9C333F0067E86F /* RNTwilioVoice.h in CopyFiles */,
+				38F71DFB1E9C333F0067E86F /* RNTwilioVoiceSDK.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -27,9 +27,9 @@
 
 /* Begin PBXFileReference section */
 		016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TwilioVoice.framework; path = "../../../Downloads/twilio-voice-ios/TwilioVoice.framework"; sourceTree = "<group>"; };
-		38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTwilioVoice.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTwilioVoice.h; sourceTree = "<group>"; };
-		38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTwilioVoice.m; sourceTree = "<group>"; };
+		38F71DF51E9C333F0067E86F /* libRNTwilioVoiceSDK.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTwilioVoiceSDK.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		38F71DF81E9C333F0067E86F /* RNTwilioVoiceSDK.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTwilioVoiceSDK.h; sourceTree = "<group>"; };
+		38F71DF91E9C333F0067E86F /* RNTwilioVoiceSDK.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTwilioVoiceSDK.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,7 +55,7 @@
 		38F71DEC1E9C333E0067E86F = {
 			isa = PBXGroup;
 			children = (
-				38F71DF71E9C333F0067E86F /* RNTwilioVoice */,
+				38F71DF71E9C333F0067E86F /* RNTwilioVoiceSDK */,
 				38F71DF61E9C333F0067E86F /* Products */,
 				016DD9801ECC9B4B00315CD4 /* Frameworks */,
 			);
@@ -64,26 +64,26 @@
 		38F71DF61E9C333F0067E86F /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */,
+				38F71DF51E9C333F0067E86F /* libRNTwilioVoiceSDK.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		38F71DF71E9C333F0067E86F /* RNTwilioVoice */ = {
+		38F71DF71E9C333F0067E86F /* RNTwilioVoiceSDK */ = {
 			isa = PBXGroup;
 			children = (
-				38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */,
-				38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */,
+				38F71DF81E9C333F0067E86F /* RNTwilioVoiceSDK.h */,
+				38F71DF91E9C333F0067E86F /* RNTwilioVoiceSDK.m */,
 			);
-			path = RNTwilioVoice;
+			path = RNTwilioVoiceSDK;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		38F71DF41E9C333F0067E86F /* RNTwilioVoice */ = {
+		38F71DF41E9C333F0067E86F /* RNTwilioVoiceSDK */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 38F71DFE1E9C333F0067E86F /* Build configuration list for PBXNativeTarget "RNTwilioVoice" */;
+			buildConfigurationList = 38F71DFE1E9C333F0067E86F /* Build configuration list for PBXNativeTarget "RNTwilioVoiceSDK" */;
 			buildPhases = (
 				38F71DF11E9C333F0067E86F /* Sources */,
 				38F71DF31E9C333F0067E86F /* CopyFiles */,
@@ -93,9 +93,9 @@
 			);
 			dependencies = (
 			);
-			name = RNTwilioVoice;
+			name = RNTwilioVoiceSDK;
 			productName = TwilioVoice;
-			productReference = 38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */;
+			productReference = 38F71DF51E9C333F0067E86F /* libRNTwilioVoiceSDK.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -113,7 +113,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 38F71DF01E9C333E0067E86F /* Build configuration list for PBXProject "RNTwilioVoice" */;
+			buildConfigurationList = 38F71DF01E9C333E0067E86F /* Build configuration list for PBXProject "RNTwilioVoiceSDK" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -125,7 +125,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				38F71DF41E9C333F0067E86F /* RNTwilioVoice */,
+				38F71DF41E9C333F0067E86F /* RNTwilioVoiceSDK */,
 			);
 		};
 /* End PBXProject section */
@@ -135,7 +135,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				38F71DFA1E9C333F0067E86F /* RNTwilioVoice.m in Sources */,
+				38F71DFA1E9C333F0067E86F /* RNTwilioVoiceSDK.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -279,7 +279,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		38F71DF01E9C333E0067E86F /* Build configuration list for PBXProject "RNTwilioVoice" */ = {
+		38F71DF01E9C333E0067E86F /* Build configuration list for PBXProject "RNTwilioVoiceSDK" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				38F71DFC1E9C333F0067E86F /* Debug */,
@@ -288,7 +288,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		38F71DFE1E9C333F0067E86F /* Build configuration list for PBXNativeTarget "RNTwilioVoice" */ = {
+		38F71DFE1E9C333F0067E86F /* Build configuration list for PBXNativeTarget "RNTwilioVoiceSDK" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				38F71DFF1E9C333F0067E86F /* Debug */,

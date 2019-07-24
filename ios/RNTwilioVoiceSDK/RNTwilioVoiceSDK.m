@@ -1,19 +1,19 @@
 //
-//  TwilioVoice.m
+//  RNTwilioVoiceSDK.m
 //
 
-#import "RNTwilioVoice.h"
+#import "RNTwilioVoiceSDK.h"
 #import <React/RCTLog.h>
 
 @import AVFoundation;
 @import TwilioVoice;
 
-@interface RNTwilioVoice () <TVOCallDelegate>
+@interface RNTwilioVoiceSDK () <TVOCallDelegate>
 
 @property (nonatomic, strong) TVOCall *call;
 @end
 
-@implementation RNTwilioVoice {
+@implementation RNTwilioVoiceSDK {
 }
 
 NSString * const StateConnecting = @"CONNECTING";
