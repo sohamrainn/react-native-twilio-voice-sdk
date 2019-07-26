@@ -92,8 +92,14 @@ RCT_EXPORT_METHOD(sendDigits: (NSString *)digits){
   }
 }
 
+RCT_REMAP_METHOD(getVersion,
+                 getVersionResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject){
+  resolve(TwilioVoice.sdkVersion);
+}
+
 RCT_REMAP_METHOD(getActiveCall,
-                 resolver:(RCTPromiseResolveBlock)resolve
+                 activeCallResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject){
 
   if (self.call) {

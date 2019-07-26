@@ -219,6 +219,11 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
     }
 
     @ReactMethod
+    public void getVersion(Promise promise) {
+        promise.resolve(Voice.getVersion());
+    }
+
+    @ReactMethod
     public void getActiveCall(Promise promise) {
         if (activeCall != null) {
             if (BuildConfig.DEBUG) {

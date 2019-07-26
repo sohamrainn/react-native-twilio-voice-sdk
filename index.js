@@ -1,11 +1,8 @@
 import {
     NativeModules,
     NativeEventEmitter,
-    Platform,
 } from 'react-native'
-
-const ANDROID = 'android'
-const IOS = 'ios'
+import {version} from './package.json';
 
 const TwilioVoice = NativeModules.RNTwilioVoiceSDK
 
@@ -20,11 +17,24 @@ const _eventHandlers = {
     ringing: new Map(),
 }
 
+let nativeVersion;
+
 const Twilio = {
-    // initialize the library with Twilio access token
-    // return {initialized: true} when the initialization started
-    // Listen to deviceReady and deviceNotReady events to see whether
-    // the initialization succeeded
+    getVersion() {
+      return version
+    },
+    getNativeVersion() {
+        if(nativeVersion) {
+          return Promise.resolve(nativeVersion)
+        }
+        return new Promise(resolve =>
+           TwilioVoice.getVersion()
+             .then(v => {
+                 nativeVersion = v
+                 resolve(v)
+             })
+        )
+    },
     connect(accessToken, options = {}) {
         TwilioVoice.connect(accessToken, options)
     },
@@ -40,11 +50,7 @@ const Twilio = {
     sendDigits(digits) {
         TwilioVoice.sendDigits(digits)
     },
-    requestPermissions(senderId) {
-        if (Platform.OS === ANDROID) {
-            TwilioVoice.requestPermissions(senderId)
-        }
-    },
+
     getActiveCall() {
         return TwilioVoice.getActiveCall()
     },
