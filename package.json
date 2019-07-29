@@ -1,12 +1,20 @@
 {
   "name": "react-native-twilio-voice-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "React Native wrapper for Twilio Programmable Voice SDK",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ts:js": "tsc",
+    "ts:defs": "tsc --declaration --outDir . --emitDeclarationOnly",
+    "prepublishOnly": "yarn ts:js; yarn ts:defs",
+    "postpublish": "rm -r *.d.ts dist"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/react-native": "^0.60.2",
+    "react-native": "^0.60.4",
+    "typescript": "^3.5.3"
+  },
   "homepage": "https://github.com/elyalvarado/react-native-twilio-voice-sdk",
   "keywords": [
     "twilio",
@@ -31,5 +39,8 @@
   "author": {
     "name": "Ely Alvarado"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "peerDependencies": {
+    "react-native": "^0.60.0"
+  }
 }
