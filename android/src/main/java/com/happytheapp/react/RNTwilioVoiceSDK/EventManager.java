@@ -13,11 +13,11 @@ public class EventManager {
 
     private ReactApplicationContext mContext;
 
-    public static final String EVENT_CONNECTED = "connected";
+    public static final String EVENT_CONNECTED = "connect";
     public static final String EVENT_CONNECT_FAILURE = "connectFailure";
     public static final String EVENT_RECONNECTING = "reconnecting";
-    public static final String EVENT_RECONNECTED = "reconnected";
-    public static final String EVENT_DISCONNECTED = "disconnected";
+    public static final String EVENT_RECONNECTED = "reconnect";
+    public static final String EVENT_DISCONNECTED = "disconnect";
     public static final String EVENT_RINGING = "ringing";
 
     public EventManager(ReactApplicationContext context) {

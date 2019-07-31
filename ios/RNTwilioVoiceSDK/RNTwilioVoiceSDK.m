@@ -31,7 +31,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-  return @[@"ringing", @"connected", @"connectFailure", @"reconnecting", @"reconnected", @"disconnected"];
+  return @[@"ringing", @"connect", @"connectFailure", @"reconnecting", @"reconnect", @"disconnect"];
 }
 
 @synthesize bridge = _bridge;
@@ -169,7 +169,7 @@ RCT_REMAP_METHOD(getActiveCall,
   self.call = call;
 
   NSMutableDictionary *callParams = [self callParamsFor:call];
-  [self sendEventWithName:@"connected" body:callParams];
+  [self sendEventWithName:@"connect" body:callParams];
 }
 
 - (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
@@ -185,7 +185,7 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"Call disconnected with error: %@", error);
 
   NSMutableDictionary *callParams = [self paramsForError:error];
-  [self sendEventWithName:@"disconnected" body:callParams];
+  [self sendEventWithName:@"disconnect" body:callParams];
   [self disconnect];
   self.call = nil;
 }
@@ -208,7 +208,7 @@ RCT_REMAP_METHOD(getActiveCall,
   self.call = call;
 
   NSMutableDictionary *callParams = [self callParamsFor:call];
-  [self sendEventWithName:@"reconnected" body:callParams];
+  [self sendEventWithName:@"reconnect" body:callParams];
 }
 
 #pragma mark - AVAudioSession
