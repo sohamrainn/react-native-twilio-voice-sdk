@@ -1,0 +1,253 @@
+import {EmitterSubscription, NativeEventEmitter, NativeModules} from 'react-native'
+
+import Call, {nativeCallObject} from './call'
+import CallInvite from "./callInvite"
+import CancelledCallInvite from "./cancelledCallInvite"
+import CallError from "./callError"
+
+const version = require('../package.json').version
+
+const TwilioVoice = NativeModules.RNTwilioVoiceSDK
+
+type voiceStatus = "READY" | "OFFLINE" | "BUSY"
+
+type registrationEvent = "ready" | "offline"
+type inviteEvent = "incoming" | "cancel"
+type callEventWithoutError = "connect" | "reconnect" | "ringing"
+type callEventWithError = "connectFailure" | "reconnecting" | "disconnect"
+type callEvent = callEventWithoutError | callEventWithError
+type voiceEvent = registrationEvent | inviteEvent | callEvent
+
+type callEventHandler = (call: Call) => void
+type callEventWithErrorHandler = (call: Call, err?: CallError) => void
+type callInviteHandler = (invite: CallInvite) => void
+type callInviteCancelHandler = (canceledInvite: CancelledCallInvite) => void
+type registrationEventHandler = (err?: Error) => void
+type handlerFn = callEventHandler | callInviteHandler | callInviteCancelHandler | registrationEventHandler
+type voiceEventHandlers = Partial<{
+    [key in voiceEvent]: Array<handlerFn>
+}>
+type internalCallEventHandlers = Partial<{
+  [key in callEvent]: EmitterSubscription | null
+}>
+type internalInviteEventHandlers = Partial<{
+  [key in inviteEvent]: EmitterSubscription | null
+}>
+type internalVoiceEventHandlers = internalCallEventHandlers & internalInviteEventHandlers
+
+
+class Voice {
+  // private _registered: boolean = false
+  private _currentCall: Call | null = null
+  // private _currentInvite: CallInvite | null = null
+  private _nativeAppEventEmitter = new NativeEventEmitter(TwilioVoice)
+  private _internalEventHandlers: internalVoiceEventHandlers = {}
+  private _eventHandlers: voiceEventHandlers = {}
+  private _isSetup: boolean = false
+  private _nativeVersion: string | undefined
+
+  public constructor () {
+    this.setup()
+    this.on.bind(this)
+  }
+
+  public getVersion = (): string => {
+      return version
+  }
+
+  public getNativeVersion = (): Promise<string> => {
+    if(this._nativeVersion) {
+      return Promise.resolve(this._nativeVersion)
+    }
+    return new Promise<string>(resolve =>
+      TwilioVoice.getVersion()
+        .then((v: string) => {
+          this._nativeVersion = v
+          resolve(v)
+        })
+    )
+  }
+
+  private setup = () => {
+    this.addInternalCallEventHandlers()
+    this._isSetup = true
+  }
+
+  public connect = (accessToken: string, params = {}) => {
+    if(!this._isSetup) {
+      throw new Error("Can't call connect on a destroyed Voice instance")
+    }
+    if(this._currentCall !== null) {
+      return // There is already a call going on, can't call connect
+    }
+    TwilioVoice.connect(accessToken, params)
+  }
+
+  public currentCall = () => {
+    return this._currentCall
+  }
+
+  public destroy = () => {
+    this.disconnectAll()
+    this._eventHandlers = {}
+    this._isSetup = false
+    this.removeInternalCallEventHandlers()
+  }
+
+  public status = (): voiceStatus => {
+    if(this._currentCall !== null) {
+      return "BUSY"
+    }
+    // if(this._registered) {
+    //   return "READY"
+    // }
+    return "OFFLINE"
+  }
+
+  // // TODO: Implement this
+  // public register = (): void => {
+  //   if(!this._isSetup) {
+  //     throw new Error("Can't call connect without calling setup first")
+  //   }
+  //   this._registered = true
+  // }
+  //
+  // // TODO: Implement this
+  // public unregister = (): void => {
+  //   if(!this._registered) {
+  //     return // Calling unregister without being registered first
+  //   }
+  //   this._registered = false
+  // }
+
+  on(event: callEventWithoutError, handler: callEventHandler): void;
+  on(event: callEventWithError, handler: callEventWithErrorHandler): void;
+  on(event: "incoming", handler: callInviteHandler): void;
+  on(event: "cancel", handler: callInviteCancelHandler): void;
+  on(event: registrationEvent, handler: registrationEventHandler): void
+  public on(event: voiceEvent, handler: handlerFn): void {
+    if(this._eventHandlers[event] === undefined) {
+      this._eventHandlers[event] = []
+    }
+    this._eventHandlers[event]!.push(handler)
+  }
+
+  public removeListener = (event: voiceEvent, handler: handlerFn): void => {
+    if(this._eventHandlers[event] === undefined) { return } // no handlers for event
+    const firstAppearance = this._eventHandlers[event]!.findIndex(fn => fn === handler)
+    if(firstAppearance === -1) { return } // handler doesn't exist
+    this._eventHandlers[event]!.splice(firstAppearance, 1)
+  }
+
+  private addInternalCallEventHandlers = () => {
+    const handlers: { [key in callEvent]: handlerFn} = {
+      "connect": this.onConnect,
+      "disconnect": this.onDisconnect,
+      "connectFailure": this.onConnectFailure,
+      "reconnect": this.onReconnect,
+      "reconnecting": this.onReconnecting,
+      "ringing": this.onRinging
+    }
+    let event: callEvent
+    for (event in handlers) {
+      if(this._internalEventHandlers[event] === undefined) {
+        this._internalEventHandlers[event] = this._nativeAppEventEmitter.addListener(event, handlers[event])
+      }
+    }
+  }
+
+  private removeInternalCallEventHandlers = () => {
+    const callEvents: Set<callEvent> = new Set(["connect", "disconnect", "connectFailure", "reconnect", "reconnecting", "ringing"])
+    let event: callEvent
+    for(event of callEvents) {
+      if(this._internalEventHandlers[event] !== undefined) {
+        this._internalEventHandlers[event]!.remove()
+        delete this._internalEventHandlers[event]
+      }
+    }
+  }
+
+  private handleEvent = (eventName: voiceEvent, ...args: any[]) => {
+    if(this._eventHandlers[eventName] === undefined) {
+      return
+    }
+    let handler: handlerFn
+    for(handler of this._eventHandlers[eventName]!) {
+      // @ts-ignore too much meta-programming for typescript
+      handler(...args)
+    }
+  }
+
+  private createOrUpdateCall = (nativeCallObject: nativeCallObject) => {
+    if(this._currentCall === null) {
+      // @ts-ignore we're calling the private constructor on purpose
+      // the constructor is private to hide it from Intellisense
+      this._currentCall = new Call(nativeCallObject)
+    } else {
+      // @ts-ignore we're calling the protected method on purpose
+      // that method is protected to hide it from Intellisense
+      this._currentCall.updateFromNativeCallObject(nativeCallObject)
+    }
+  }
+
+  private createCallError = (nativeCallObject: nativeCallObject): Error | undefined => {
+    if(nativeCallObject.error !== undefined) {
+      const { message, code, reason } = nativeCallObject.error
+      return new CallError(message, reason, code)
+    }
+    return
+  }
+
+  private parseNativeCallObject = (nativeCallObject: nativeCallObject): Error | undefined => {
+    this.createOrUpdateCall(nativeCallObject)
+    return this.createCallError(nativeCallObject)
+  }
+
+  private onConnect = (nativeCallObject: nativeCallObject) => {
+    this.parseNativeCallObject(nativeCallObject)
+    this.handleEvent("connect", this._currentCall)
+  }
+
+  private onDisconnect = (nativeCallObject: nativeCallObject) => {
+    const error = this.parseNativeCallObject(nativeCallObject)
+    this.handleEvent("disconnect", this._currentCall, error)
+    // After disconnect the current call is null
+    this._currentCall = null
+  }
+
+  private onConnectFailure = (nativeCallObject: nativeCallObject) => {
+    const error = this.parseNativeCallObject(nativeCallObject)
+    this.handleEvent("connectFailure", this._currentCall, error)
+    // After connect failure the current call is null
+    this._currentCall = null
+  }
+
+  private onReconnect = (nativeCallObject: nativeCallObject) => {
+    this.parseNativeCallObject(nativeCallObject)
+    this.handleEvent("reconnect", this._currentCall)
+  }
+
+  private onReconnecting = (nativeCallObject: nativeCallObject) => {
+    const error = this.parseNativeCallObject(nativeCallObject)
+    this.handleEvent("reconnecting", this._currentCall, error)
+  }
+
+  private onRinging = (nativeCallObject: nativeCallObject) => {
+    this.parseNativeCallObject(nativeCallObject)
+    this.handleEvent("ringing", this._currentCall)
+  }
+
+  private disconnectAll() {
+    // if(this._registered) { this.unregister() }
+    // if(this._currentInvite !== null) {
+    //   this._currentInvite.reject()
+    //   this._currentInvite = null
+    // }
+    if(this._currentCall !== null) {
+      this._currentCall.disconnect()
+      this._currentCall = null
+    }
+  }
+}
+
+export default new Voice()
