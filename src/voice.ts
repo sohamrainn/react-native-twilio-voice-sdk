@@ -186,7 +186,7 @@ class Voice {
     } else {
       // @ts-ignore we're calling the protected method on purpose
       // that method is protected to hide it from Intellisense
-      this._currentCall.updateFromNativeCallObject(nativeCallObject)
+      this._currentCall.updateFromNative(nativeCallObject)
     }
   }
 
