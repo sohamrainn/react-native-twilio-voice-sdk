@@ -233,7 +233,7 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
             promise.resolve(paramsFromCall(activeCall));
             return;
         }
-        promise.reject("no_call","There was no active call", null);
+        promise.reject("no_call","There was no active call");
     }
 
     @ReactMethod
