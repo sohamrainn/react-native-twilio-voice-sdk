@@ -175,6 +175,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
   NSLog(@"Call failed to connect: %@", error);
 
+  self.call = call;
   NSMutableDictionary *callParams = [self paramsForError:error];
   [self sendEventWithName:@"connectFailure" body:callParams];
   [self disconnect];
@@ -184,6 +185,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)call:(TVOCall *)call didDisconnectWithError:(NSError *)error {
   NSLog(@"Call disconnected with error: %@", error);
 
+  self.call = call;
   NSMutableDictionary *callParams = [self paramsForError:error];
   [self sendEventWithName:@"disconnect" body:callParams];
   [self disconnect];
@@ -200,6 +202,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)call:(TVOCall *)call isReconnectingWithError:(NSError *)error {
   NSLog(@"Call is reconnecting with error: %@", error);
 
+  self.call = call;
   NSMutableDictionary *callParams = [self paramsForError:error];
   [self sendEventWithName:@"reconnecting" body:callParams];
 }

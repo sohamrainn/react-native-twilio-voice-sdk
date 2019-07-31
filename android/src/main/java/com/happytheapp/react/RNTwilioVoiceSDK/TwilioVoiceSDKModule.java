@@ -119,10 +119,11 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
 
             @Override
             public void onDisconnected(@NonNull Call call, CallException error) {
-                audioFocusManager.unsetAudioFocus();
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "call disconnected");
                 }
+                activeCall = call;
+                audioFocusManager.unsetAudioFocus();
                 eventManager.sendEvent(EVENT_DISCONNECTED, paramsWithError(call, error));
                 call.disconnect();
                 activeCall = null;
@@ -130,11 +131,11 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
 
             @Override
             public void onConnectFailure(@NonNull Call call, @NonNull CallException error) {
-                audioFocusManager.unsetAudioFocus();
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "connect failure");
                 }
-
+                activeCall = call;
+                audioFocusManager.unsetAudioFocus();
                 WritableMap params = paramsWithError(call, error);
                 call.disconnect();
                 activeCall = null;
@@ -146,8 +147,8 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "ringing");
                 }
-                audioFocusManager.setAudioFocus();
                 activeCall = call;
+                audioFocusManager.setAudioFocus();
                 eventManager.sendEvent(EVENT_RINGING, paramsFromCall(call));
             }
         };
