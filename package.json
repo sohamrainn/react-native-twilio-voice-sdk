@@ -7,7 +7,7 @@
   "scripts": {
     "ts:js": "tsc",
     "prepublishOnly": "yarn ts:js",
-    "postpublish": "rm -r *.d.ts dist"
+    "postpublish": "rm -r dist"
   },
   "devDependencies": {
     "@types/react-native": "^0.60.2",
