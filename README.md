@@ -21,66 +21,66 @@ npm install react-native-twilio-voice-sdk --save
 
 ## Usage
 
+The library tries to mimic the Twilio Voice SDK API for Android and iOS with some idiomatic changes for Javascript.
+
+The SDK is composed of several key classes illustrated in the image below.
+
+The class TwilioVoice is the entry point into the SDK and does the following:
+
+- Make outgoing calls with TwilioVoice.connect(...)
+- The class Call represents an outgoing call.
+
+![UML Diagram](./images/RNTwilioVoiceSDK_UML.png)
+
+### Code example
 ```javascript
 import TwilioVoice from 'react-native-twilio-voice-sdk'
 
 // Get the library version
-TwilioVoice.getVersion()
+TwilioVoice.version
 
 // Get the underlying native TwilioVoice library version
-// getNativeVersion() returns a promise with the version value
-TwilioVoice.getNativeVersion().then(v => console.log(v));
+TwilioVoice.nativeVersion
+
+// Subscribe to call events
+let call
+const removeSubscription = TwilioVoice.on("connect", connectedCall => call = connectedCall)
+// call removeSubscription() to stop listening
 
 // start a call
 TwilioVoice.connect(accessToken, {to: '+61234567890'})
 
 // hangup
-TwilioVoice.disconnect()
+call.disconnect()
 
 // mute or un-mute the call
 // mutedValue must be a boolean
-TwilioVoice.setMuted(mutedValue)
+call.muted(mutedValue)
 
 // Send the call audio to the speaker phone
 // speakerPhoneEnabled must be a boolean
-TwilioVoice.setSpeakerPhone(speakerPhoneEnabled)
+call.setSpeakerPhone(speakerPhoneEnabled)
 
-TwilioVoice.sendDigits(digits)
+call.sendDigits(digits)
 
-// The getActiveCall() method returns a promise which resolves
-// to an object that conforms with the Call interface (see events)
-TwilioVoice.getActiveCall().then((incomingCall: CallInterface) => {})
+// Call properties
+call.from
+call.to
+call.sid
+call.state // "RINGING" | "CONNECTING" | "CONNECTED" | "RECONNECTING" | "DISCONNECTED"
 ```
 
-## Events
+### Events
+
+All calls to the `on` method return a function that removes the subscription upon execution.
 
 ```javascript
-// The call object interface used in the events is as follows (typescript notation):
-// { 
-//    sid: string, // Twilio call sid
-//    state: 'RINGING' | 'CONNECTING' | 'CONNECTED' | 'DISCONNECTED' | 'RECONNECTING',
-//    from?: string, // Optional from number/string set by Twilio
-//    to?: string, // Optional to number/string set by Twilio
-//    error?: errorInterface // Optional error message in some cases
-// }
-//
-// The error Interface is as follows:
-// {
-//   message?: string, // Error message
-//   code?: int, // Twilio's error code
-//   domain?: string, // Error domain (only on iOS)
-//   reason?: string, // Underlying reason provided by Twilio
-// }
-
-TwilioVoice.addEventListener('ringing', function(call: callInterface) {});
-TwilioVoice.addEventListener('connected', function(call: callInterface) {});
-TwilioVoice.addEventListener('connectFailure', function(call: callInterfaceWithError) {});
-TwilioVoice.addEventListener('reconnecting', function(call: callInterfaceWithError) {});
-TwilioVoice.addEventListener('reconnected', function(call: callInterface) {});
-TwilioVoice.addEventListener('disconnected', function(call: callInterface) {});
-
-
-
+TwilioVoice.on('ringing', function(call: Call): void);
+TwilioVoice.on('connect', function(call: Call): void);
+TwilioVoice.on('connectFailure', function(call: Call, err?: Error): void);
+TwilioVoice.on('reconnecting', function(call: Call, err?: Error): void);
+TwilioVoice.on('reconnect', function(call: Call): void);
+TwilioVoice.on('disconnect', function(call: Call, err?: Error): void);
 ```
 
 ## Twilio Voice SDK reference
