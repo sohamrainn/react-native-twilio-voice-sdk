@@ -7,7 +7,7 @@ import CallError from "./callError"
 
 const version = require('../package.json').version
 
-const TwilioVoice = NativeModules.RNTwilioVoiceSDK
+const RNTwilioVoice = NativeModules.RNTwilioVoiceSDK
 
 type voiceStatus = "READY" | "OFFLINE" | "BUSY"
 
@@ -35,12 +35,13 @@ type internalInviteEventHandlers = Partial<{
 }>
 type internalVoiceEventHandlers = internalCallEventHandlers & internalInviteEventHandlers
 
+type removeHandlerFn = () => void
 
-class Voice {
+class TwilioVoice {
   // private _registered: boolean = false
   private _currentCall: Call | null = null
   // private _currentInvite: CallInvite | null = null
-  private _nativeAppEventEmitter = new NativeEventEmitter(TwilioVoice)
+  private _nativeAppEventEmitter = new NativeEventEmitter(RNTwilioVoice)
   private _internalEventHandlers: internalVoiceEventHandlers = {}
   private _eventHandlers: voiceEventHandlers = {}
   private _isSetup: boolean = false
@@ -49,28 +50,25 @@ class Voice {
   public constructor () {
     this.setup()
     this.on.bind(this)
+    this.getNativeVersion().then()
   }
 
-  public getVersion = (): string => {
+  public get version(): string {
       return version
   }
 
-  public getNativeVersion = (): Promise<string> => {
-    if(this._nativeVersion) {
-      return Promise.resolve(this._nativeVersion)
-    }
-    return new Promise<string>(resolve =>
-      TwilioVoice.getVersion()
-        .then((v: string) => {
-          this._nativeVersion = v
-          resolve(v)
-        })
-    )
+  public get nativeVersion(): string | undefined {
+    return this._nativeVersion
   }
 
-  private setup = () => {
-    this.addInternalCallEventHandlers()
-    this._isSetup = true
+  public get status(): voiceStatus {
+    if(this._currentCall !== null) {
+      return "BUSY"
+    }
+    // if(this._registered) {
+    //   return "READY"
+    // }
+    return "OFFLINE"
   }
 
   public connect = (accessToken: string, params = {}) => {
@@ -80,11 +78,7 @@ class Voice {
     if(this._currentCall !== null) {
       return // There is already a call going on, can't call connect
     }
-    TwilioVoice.connect(accessToken, params)
-  }
-
-  public currentCall = () => {
-    return this._currentCall
+    RNTwilioVoice.connect(accessToken, params)
   }
 
   public destroy = () => {
@@ -92,16 +86,6 @@ class Voice {
     this._eventHandlers = {}
     this._isSetup = false
     this.removeInternalCallEventHandlers()
-  }
-
-  public status = (): voiceStatus => {
-    if(this._currentCall !== null) {
-      return "BUSY"
-    }
-    // if(this._registered) {
-    //   return "READY"
-    // }
-    return "OFFLINE"
   }
 
   // // TODO: Implement this
@@ -120,23 +104,46 @@ class Voice {
   //   this._registered = false
   // }
 
-  on(event: callEventWithoutError, handler: callEventHandler): void;
-  on(event: callEventWithError, handler: callEventWithErrorHandler): void;
-  on(event: "incoming", handler: callInviteHandler): void;
-  on(event: "cancel", handler: callInviteCancelHandler): void;
-  on(event: registrationEvent, handler: registrationEventHandler): void
-  public on(event: voiceEvent, handler: handlerFn): void {
+  on(event: "connect", handler: callEventHandler): removeHandlerFn;
+  on(event: "reconnect", handler: callEventHandler): removeHandlerFn;
+  on(event: "ringing", handler: callEventHandler): removeHandlerFn;
+  on(event: "connectFailure", handler: callEventWithErrorHandler): removeHandlerFn;
+  on(event: "reconnecting", handler: callEventWithErrorHandler): removeHandlerFn;
+  on(event: "disconnect", handler: callEventWithErrorHandler): removeHandlerFn;
+  // on(event: "incoming", handler: callInviteHandler): removeEventHandler;
+  // on(event: "cancel", handler: callInviteCancelHandler): removeEventHandler;
+  // on(event: registrationEvent, handler: registrationEventHandler):removeEventHandler
+  public on(event: voiceEvent, handler: handlerFn) {
     if(this._eventHandlers[event] === undefined) {
       this._eventHandlers[event] = []
     }
     this._eventHandlers[event]!.push(handler)
+    return this.removeListener(event, handler)
   }
 
-  public removeListener = (event: voiceEvent, handler: handlerFn): void => {
+  private removeListener = (event: voiceEvent, handler: handlerFn) => () => {
     if(this._eventHandlers[event] === undefined) { return } // no handlers for event
     const firstAppearance = this._eventHandlers[event]!.findIndex(fn => fn === handler)
     if(firstAppearance === -1) { return } // handler doesn't exist
     this._eventHandlers[event]!.splice(firstAppearance, 1)
+  }
+
+  private getNativeVersion = (): Promise<string> => {
+    if(this._nativeVersion) {
+      return Promise.resolve(this._nativeVersion)
+    }
+    return new Promise<string>(resolve =>
+      RNTwilioVoice.getVersion()
+        .then((v: string) => {
+          this._nativeVersion = v
+          resolve(v)
+        })
+    )
+  }
+
+  private setup = () => {
+    this.addInternalCallEventHandlers()
+    this._isSetup = true
   }
 
   private addInternalCallEventHandlers = () => {
@@ -250,4 +257,4 @@ class Voice {
   }
 }
 
-export default new Voice()
+export default new TwilioVoice()
