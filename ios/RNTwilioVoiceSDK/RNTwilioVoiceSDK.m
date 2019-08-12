@@ -42,7 +42,11 @@ RCT_EXPORT_MODULE()
     }
 }
 
-RCT_EXPORT_METHOD(connect: (NSString *)accessToken options:(NSDictionary *)options) {
+RCT_REMAP_METHOD(connect,
+                 accessToken:(NSString *)accessToken
+                 options:(NSDictionary *)options
+                 connectResolver:(RCTPromiseResolveBlock)resolve
+                 rejecter:(RCTPromiseRejectBlock)reject) {
 //  NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
 
 //  [TwilioVoice setLogLevel:TVOLogLevelVerbose];
@@ -52,7 +56,8 @@ RCT_EXPORT_METHOD(connect: (NSString *)accessToken options:(NSDictionary *)optio
 //  device.proximityMonitoringEnabled = YES;
 
   if (self.call) {
-    [self.call disconnect];
+//    [self.call disconnect];
+    reject(@"already_connected",@"Calling connect while a call is connected",nil);
   } else {
     NSUUID *uuid = [NSUUID UUID];
       TVOConnectOptions *connectOptions = [TVOConnectOptions optionsWithAccessToken:accessToken
@@ -67,6 +72,8 @@ RCT_EXPORT_METHOD(connect: (NSString *)accessToken options:(NSDictionary *)optio
                                                                               }];
 
       self.call = [TwilioVoice connectWithOptions:connectOptions delegate:self];
+      NSMutableDictionary *params = [self callParamsFor:self.call];
+      resolve(params);
     // [self performStartCallActionWithUUID:uuid handle:handle];
   }
 }

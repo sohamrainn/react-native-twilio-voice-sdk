@@ -156,9 +156,13 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
 
 
     @ReactMethod
-    public void connect(final String accessToken, ReadableMap params) {
+    public void connect(final String accessToken, ReadableMap params, Promise promise) {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "connect params: "+params);
+        }
+
+        if (activeCall != null) {
+            promise.reject("already_connected","Calling connect while a call is connected");
         }
 
         // create parameters for call
@@ -195,6 +199,7 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
                 // .region()
                 .build();
         activeCall = Voice.connect(getReactApplicationContext(), connectOptions, callListener);
+        promise.resolve(paramsFromCall(activeCall));
     }
 
     @ReactMethod

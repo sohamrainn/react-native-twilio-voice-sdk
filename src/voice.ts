@@ -71,14 +71,14 @@ class TwilioVoice {
     return "OFFLINE"
   }
 
-  public connect = (accessToken: string, params = {}) => {
+  public connect = (accessToken: string, params = {}): Promise<Call> => {
     if(!this._isSetup) {
-      throw new Error("Can't call connect on a destroyed Voice instance")
+      return Promise.reject(new Error("Can't call connect on a destroyed Voice instance"));
     }
     if(this._currentCall !== null) {
-      return // There is already a call going on, can't call connect
+      return Promise.reject(new Error("Can't call connect while a call is still going on"));
     }
-    RNTwilioVoice.connect(accessToken, params)
+    return RNTwilioVoice.connect(accessToken, params)
   }
 
   public destroy = () => {
