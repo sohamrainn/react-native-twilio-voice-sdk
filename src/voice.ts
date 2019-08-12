@@ -78,7 +78,12 @@ class TwilioVoice {
     if(this._currentCall !== null) {
       return Promise.reject(new Error("Can't call connect while a call is still going on"));
     }
-    return RNTwilioVoice.connect(accessToken, params)
+    return new Promise((resolve, reject) => {
+      RNTwilioVoice.connect(accessToken, params).then((call: Call) => {
+        this.createOrUpdateCall(call)
+        resolve(this._currentCall as Call)
+      }).catch((err: any) => reject(err))
+    })
   }
 
   public destroy = () => {
