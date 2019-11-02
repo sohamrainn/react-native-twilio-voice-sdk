@@ -205,6 +205,8 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
     @ReactMethod
     public void disconnect() {
         if (activeCall != null) {
+            setMuted(false);
+            setSpeakerPhone(false);
             activeCall.disconnect();
             activeCall = null;
         }

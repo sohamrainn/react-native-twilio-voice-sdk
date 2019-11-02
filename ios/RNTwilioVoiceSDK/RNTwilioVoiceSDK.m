@@ -80,6 +80,8 @@ RCT_REMAP_METHOD(connect,
 
 RCT_EXPORT_METHOD(disconnect) {
   NSLog(@"Disconnecting call");
+    self.call.muted = false;
+    [self toggleAudioRoute:false];
     [self.call disconnect];
 }
 
