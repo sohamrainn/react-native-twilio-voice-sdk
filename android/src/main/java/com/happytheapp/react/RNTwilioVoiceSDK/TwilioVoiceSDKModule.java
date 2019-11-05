@@ -42,6 +42,7 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
     private Call.Listener callListener = callListener();
     private Call activeCall;
     private AudioFocusManager audioFocusManager;
+    private ProximityManager proximityManager;
     private EventManager eventManager;
 
     public TwilioVoiceSDKModule(ReactApplicationContext reactContext) {
@@ -55,6 +56,7 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
 
         eventManager = new EventManager(reactContext);
         audioFocusManager = new AudioFocusManager(reactContext);
+        proximityManager = new ProximityManager(reactContext);
 
     }
 
@@ -165,6 +167,9 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
             promise.reject("already_connected","Calling connect while a call is connected");
         }
 
+        // Enable proximity monitoring
+        proximityManager.startProximitySensor();
+
         // create parameters for call
         HashMap<String, String> twiMLParams = new HashMap<>();
         ReadableMapKeySetIterator iterator = params.keySetIterator();
@@ -206,7 +211,8 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
     public void disconnect() {
         if (activeCall != null) {
             setMuted(false);
-            setSpeakerPhone(false);
+            disableSpeakerPhone();
+            proximityManager.stopProximitySensor();
             activeCall.disconnect();
             activeCall = null;
         }
@@ -246,6 +252,15 @@ public class TwilioVoiceSDKModule extends ReactContextBaseJavaModule implements 
     @ReactMethod
     public void setSpeakerPhone(Boolean value) {
         audioFocusManager.setSpeakerPhone(value);
+        if(value) {
+            proximityManager.stopProximitySensor();
+        } else {
+            proximityManager.startProximitySensor();
+        }
+    }
+
+    private void disableSpeakerPhone() {
+        audioFocusManager.setSpeakerPhone(false);
     }
 
     // region create JSObjects helpers

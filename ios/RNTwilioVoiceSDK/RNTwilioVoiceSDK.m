@@ -48,18 +48,15 @@ RCT_REMAP_METHOD(connect,
                  connectResolver:(RCTPromiseResolveBlock)resolve
                  rejecter:(RCTPromiseRejectBlock)reject) {
 //  NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
-
 //  [TwilioVoice setLogLevel:TVOLogLevelVerbose];
-
-    //    TODO: Enable proximityMonitoring ?
-//  UIDevice* device = [UIDevice currentDevice];
-//  device.proximityMonitoringEnabled = YES;
 
   if (self.call) {
 //    [self.call disconnect];
     reject(@"already_connected",@"Calling connect while a call is connected",nil);
   } else {
-    NSUUID *uuid = [NSUUID UUID];
+      [self enableProximityMonitoring];
+
+      NSUUID *uuid = [NSUUID UUID];
       TVOConnectOptions *connectOptions = [TVOConnectOptions optionsWithAccessToken:accessToken
                                                                               block:^(TVOConnectOptionsBuilder *builder) {
                                                                                   builder.params = options;
@@ -82,6 +79,7 @@ RCT_EXPORT_METHOD(disconnect) {
   NSLog(@"Disconnecting call");
     self.call.muted = false;
     [self toggleAudioRoute:false];
+    [self disableProximityMonitoring];
     [self.call disconnect];
 }
 
@@ -171,6 +169,18 @@ RCT_REMAP_METHOD(getActiveCall,
     return params;
 }
 
+- (void)enableProximityMonitoring {
+    // Enable Proximity monitoring
+    UIDevice* device = [UIDevice currentDevice];
+    device.proximityMonitoringEnabled = YES;
+}
+
+- (void)disableProximityMonitoring {
+    // Enable Proximity monitoring
+    UIDevice* device = [UIDevice currentDevice];
+    device.proximityMonitoringEnabled = NO;
+}
+
 #pragma mark - TVOCallDelegate
 //return @[@"ringing", @"connected", @"connectFailure", @"reconnecting", @"reconnected", @"disconnected"];
 
@@ -231,14 +241,18 @@ RCT_REMAP_METHOD(getActiveCall,
   NSLog(@"toggleAudioRoute");
 
   if (toSpeaker) {
+    [self disableProximityMonitoring];
     if (![[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideSpeaker
                                                             error:&error]) {
       NSLog(@"Unable to reroute audio: %@", [error localizedDescription]);
+      [self enableProximityMonitoring];
     }
   } else {
+    [self enableProximityMonitoring];
     if (![[AVAudioSession sharedInstance] overrideOutputAudioPort:AVAudioSessionPortOverrideNone
                                                             error:&error]) {
       NSLog(@"Unable to reroute audio: %@", [error localizedDescription]);
+      [self disableProximityMonitoring];
     }
   }
 }
